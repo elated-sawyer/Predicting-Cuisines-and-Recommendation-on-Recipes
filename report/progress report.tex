@@ -1,0 +1,195 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2016
+%
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{nips_2016}
+
+\usepackage[nonatbib,final]{nips_2016} % produce camera-ready copy
+% to compile a camera-ready version, add the [final] option, e.g.:
+% \usepackage[final]{nips_2016}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{blindtext}
+
+\usepackage[sorting=none]{biblatex}
+\addbibresource{progress.bib}
+\title{Predicting Cuisines of Recipes\\Progress Report: Group 42}
+
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+
+\author{
+  Zitian Wang\\
+  s1882252\\
+  \texttt{s1882252@ed.ac.uk} \\
+  %% examples of more authors
+  \And
+  Siyu Zhou\\
+  s2057647\\
+  \texttt{s2057647@ed.ac.uk} \\
+ \And
+  Xingjian Lu\\
+  s2014340\\
+  \texttt{s2014340@ed.ac.uk} \\
+ \And
+  Yijin Zhang\\
+  s2114888\\
+  \texttt{s2114888@ed.ac.uk}\\
+}
+
+\begin{document}
+
+\maketitle
+%
+%\begin{abstract}
+% \blindtext[1]
+%\end{abstract}
+%
+%\section{Instructions}
+%
+%The report should use this template and be 8 pages in length. Do not change %the fontsize or layout. It should be compilable with pdflatex.
+%
+%Structuring the text as follows is likely useful, but definitely
+%\emph{not} a requirement.
+%
+%\begin{itemize}
+%\item Introduction
+%  \begin{itemize}
+%  \item description of the task/objective
+%  \item relevant background and related previous work
+%  \item explanation of the significance/relevance of the objective/task
+%  \end{itemize}
+%\item Data preparation
+%\item Exploratory data analysis
+%\item Learning methods
+%\item Results
+%\item Conclusions
+%\end{itemize}
+%
+%\newpage
+\section{Introduction}
+\subsection{Description of the task/objective}
+
+Given a list of ingredients in recipes, it is the aim of this project to firstly predict the cuisines (Chinese/Japanese/Italian,...,etc) the recipes are from, and secondly if given a partial recipe, suggest the ingredients that are missing. The report begins with summarizing the relevant background and previous work, followed by exploratory data analysis on the data set available, and then introduces both the recipe prediction and partial recipe filling (recommendation system) algorithm. 
+
+\subsection{Relevant background and related previous work}
+A number of papers have looked into the prediction of cuisines based on ingredients. Ghewari et al.
+\cite{ghewari2015predicting} 
+used a multi-class Support Vector Classifier to predict the cuisine based on the ingredients; they reached a validation accuracy of 0.8132 and test accuracy of 0.7823. The performance of different classifiers were also compared in the paper, and SVM turned out to have the highest accuracy. Jayaraman et al.
+\cite{jayaraman2017analysis} 
+analysed the correlation between recipes and the ingredients with SVM and associative classification; they also compared different classifiers (Multinomial Logistic Regression, Random Forest,...,etc) and agreed with Ghewari et al. that support vector classifiers is the most accurate among all studied with an accuracy of approximately 80\%. Kumar et al.
+\cite{kumar2016cuisine}
+introduced a method of cuisine prediction based on ingredients using tree boosting algorithms; their XG-Boosting algorithm also obtained an accuracy of about 80\% for cuisine prediction, which is consistent with the previous studies.
+
+Besides, several studies also look into the collaborative filtering algorithm that we may use in completing the partial recipes. Su et al.
+\cite{su2009survey}
+provided a review for collaborative filtering techniques. The research by Sarwar et al.
+\cite{sarwar2001item}
+analysed different item-based recommendation generation algorithms and suggested that they provide dramatically performance than user-based algorithms. Wang et al.
+\cite{wang2006unifying}
+unified user-based and item-based collaborative filtering approaches by similarity fusion, achieving a more robust model to data sparsity.
+
+Specifically, for the binary feature data we are encountering, Verstrepen et al.
+\cite{cf_method1}
+provided an overview on dealing with binary, positive-only data in collaborative filtering. Lai et al.
+\cite{cf_method2}
+proposed an algorithm in binary user preference prediction problem and gained a final error rate of 2.4808\%. Those are the algorithms we can look into and learn from in this project.
+
+Also, for the performance measurement of the binary data prediction, Kumar et al.
+\cite{metrics}
+compared different distance and correlation metrics (Pearson correlation, Euclidean distance, city-block distance, etc) to identify similar user groups based on performance measures such as accuracy, sensitivity, specificity, etc. 
+
+\subsection{Explanation of the significance/relevance of the objective/task}
+What to eat and how to cook has been one of people's major daily concerns. The springing up recipe sharing and recommendation platforms call for better classification of recipes to provide people with more suitable recommendations. Also, while users may already in possession of certain ingredients, a recipe completion system is also needed to suggest what to cook and what is still needed to complete the feast. On completing this project, we hope to give more insights into these two problems and if possible, bring practical improvements to people's everyday lives.
+
+\section{Data preparation}
+The Cuisines Recipes dataset contains a total of 4236 recipes, each from one cuisine, with a total of 12 different cuisines, each containing 353 recipes. Each recipe is associated with a specific set of ingredients, and 709 different ingredients in total.
+
+\section{Exploratory data analysis}
+Exploratory data analysis mainly contains the following 3 parts:
+\begin{itemize}
+\item Count the occurrence frequency of different ingredients in each cuisine, sort according to the frequency, and plot the corresponding histogram.
+\item Count the number of types of ingredients in each cuisine and plot the corresponding histogram.
+\item In order to realize the visualization of data, the dimensionality reduction method should be used to reduce the dimension of data to two dimensions. But for different characteristics of different data sets, different dimensionality reduction methods may have different performance. Therefore, sklearn will be called, and different dimensionality reduction methods (e.g. PCA, Kernel PCA, MDS, ISOMAP) will be used to reduce the dimension of the data, and the method with good performance will be selected for analysis.
+\end{itemize}
+
+\section{Cuisine prediction}
+In this part, our aim is to predict the type of cuisine based on ingredients of the corresponding recipes. We consider each recipe as a sample point and each ingredient as a feature. If an ingredient appears in an recipe, the value of the corresponding feature of the sample is 1, otherwise it is 0.
+
+After reading the references (shown in part 2), we realize that Support Vector Machine (SVM), Logistic Regression and XG-Boosting perform well in cuisine prediction tasks. So, we plan to explore these three models, as well as some other common models, such as Decision Tree. And we can also try Multi Layer Perceptron (MLP), which can be seen as a simple neuron network that only consists of a few fully-connected layers. Then we can compare the results from the models, and find the best one.
+
+We used train\_test\_split method from sklearn to randomly split train and test set in a ratio of 0.8/0.2. So far, we have implemented Linear SVM, SVM with kernel and Logistic Regression by using Scikit-learn tool kit. The results are shown in \emph{\textbf{table}}~\ref{acc}. 
+
+
+\begin{table}[htb]
+\vskip 2mm
+\begin{center}
+\begin{tabular}{lcccc}
+\hline
+Models & Train accuracy & Test accuracy \\
+\hline
+Linear SVM &  94.7\% & 75.1\% \\
+SVM with RBF kernel & 99.1\% & 78.3\% \\
+SVM with poly kernel (degree=2) & 90.7\% & 73.9\% \\
+Logistic Regression & 90.9\% & 77.4\% \\
+\hline
+\end{tabular}
+\vskip 3mm
+\caption{Classification accuracy of models.}
+\label{acc}
+\end{center}
+\end{table}
+
+Going forward, we might try different kernels and different penalty parameter 'C' of the error term for kernel SVM. And we will continue to explore the remaining models and analyse the corresponding results. Or we might implement cross validation for these models if we have time. 
+
+\section{Collaborative Filtering}
+\begin{itemize}
+\item Dataset with NA: In this section, we first generate the new dataset. The new dataset is generated from the original dataset. We convert some interactions into NA which need to be predicted. We randomly select 1\%, 2.5\%, 5\%, 10\%, 20\%, 25\%, 33\%, 50\%, and 90\% data into NA and hence create 9 new datasets.
+\item Baselines:
+Denote the interaction of NA as N(i,j) which means a NA in the jth ingredient of ith recipe.
+
+1.Ingredient mode: predict the NA as the mode for the jth ingredient (jth column mode)
+
+2.Recipe mode: predict the NA as the mode for the ith recipe (ith row mode)
+
+3.Random Ingredient: 
+predict the NA as a random number Ing. 
+Ing follows a binomial ber($p_I$) where $p_I$ is the probability of “1” shows in the jth column (ignoring other NAs in the jth column when we calculate the probability.)
+
+4.Random Recipe:
+predict the NA as a random number Rec. 
+Rec follows a binomial ber($p_R$) where $p_R$ is the probability of “1” shows in the ith row (ignoring other NAs in the ith row when we calculate the probability.)
+
+\item Metrics: We have 3 metrics to measure the performance of prediction for binary data.\cite{metrics}
+
+Accuracy: ACC = (TP + TN) / (TP + FN)*(TN + FP)
+
+Sensitivity: SEN = TP / (TP + FN)
+
+Precision: PPV = TP / (TP + FP)
+
+\item Algorithm: We will apply a series of Collaborative Filtering algorithms. Some memory based algorithms: Content-based Model, Item-based Collaborative Filtering Model, User-based Collaborative Filtering Model, And other Model based algorithms e.g., Binary Latent Factor Model. Still need to investigate more on potential models. We will reference on \cite{cf_method1} \cite{cf_method2} for algorithms.
+
+\end{itemize}
+
+\newpage
+\printbibliography
+\end{document}
+
