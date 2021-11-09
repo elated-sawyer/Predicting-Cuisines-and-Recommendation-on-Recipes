@@ -29,4 +29,4 @@ Section3 collaborative filtering corresponds to the part2, part3, and part4 in o
 - Run section3_CF.py, who will import functions from cf_module.py.
 - The results can be seen by checking the corresponding variable in the environment.
 
-"**DME_Report.pdf**" is the final report, and its LaTeX source code is all included in the report folder. The one for the final report is final report.tex, and it's references are stored in progress.bib.
+"**DME_Report.pdf**" is the final report, and its LaTeX source code is all included in the report folder.
